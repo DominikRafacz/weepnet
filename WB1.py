@@ -71,7 +71,9 @@ steps = int(train_generator.n / 64)
 history = model.fit(train_generator, epochs=200, steps_per_epoch=steps, validation_data=validation_generator)
 
 model.save("models/wb_cnn_kaggle")
-
+model = load_model("models/wb_cnn_kaggle")
+model.evaluate(validation_generator)
+# loss - 0.45, accuracy - 0.856
 # second model from https://www.kaggle.com/c/cifar-10/discussion/40237
 
 baseMapNum = 32
@@ -143,4 +145,7 @@ model2.compile(loss='categorical_crossentropy',
                optimizer=opt_rms,
                metrics=['accuracy'])
 history2 = model2.fit(train_generator2, epochs=125, verbose=1, validation_data=validation_generator2)
+model2.evaluate(validation_generator2)
+# loss - 0.49, accuracy - 0.866
+pd.DataFrame(history2.history['accuracy']).plot()
 model2.save('models/wb_cnn_kaggle2')
