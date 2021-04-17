@@ -18,8 +18,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 from keras.callbacks import ReduceLROnPlateau
 
-
-
 # data augmentation
 train_datagen = ImageDataGenerator(
     width_shift_range=0.2,
@@ -35,16 +33,16 @@ img_size = (32, 32)
 batch_size = 100
 
 train_generator = train_datagen.flow_from_directory(
-        'data/train',
-        target_size=img_size,
-        batch_size=batch_size,
-        class_mode='sparse')
+    'data/train',
+    target_size=img_size,
+    batch_size=batch_size,
+    class_mode='sparse')
 
 validation_generator = test_datagen.flow_from_directory(
-        'data/validation',
-        target_size=img_size,
-        batch_size=batch_size,
-        class_mode='sparse')
+    'data/validation',
+    target_size=img_size,
+    batch_size=batch_size,
+    class_mode='sparse')
 
 # x, y = train_generator.next()
 # i = 7
@@ -83,10 +81,10 @@ lr = .001
 adam = Adam(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
 mdl.compile(optimizer=adam, loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 hist = mdl.fit(train_generator,
-                  epochs=100,
-                  validation_data=validation_generator,
-                  callbacks=[lrr],
-                  verbose=1)
+               epochs=100,
+               validation_data=validation_generator,
+               callbacks=[lrr],
+               verbose=1)
 
 # mdl.summary()
 # # plots of loss and accuracy
@@ -139,16 +137,16 @@ img_size = (32, 32)
 batch_size = 100
 
 train_generator = train_datagen.flow_from_directory(
-        'data/train',
-        target_size=img_size,
-        batch_size=batch_size,
-        class_mode='sparse')
+    'data/train',
+    target_size=img_size,
+    batch_size=batch_size,
+    class_mode='sparse')
 
 validation_generator = test_datagen.flow_from_directory(
-        'data/validation',
-        target_size=img_size,
-        batch_size=batch_size,
-        class_mode='sparse')
+    'data/validation',
+    target_size=img_size,
+    batch_size=batch_size,
+    class_mode='sparse')
 
 lr = .001
 
@@ -164,10 +162,9 @@ mdl2.add(Dense(10, activation='softmax'))
 sgd = SGD(lr=lr, momentum=.9, nesterov=False)
 mdl2.compile(optimizer=sgd, loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 hist2 = mdl2.fit(train_generator,
-         epochs=40,
-         validation_data=validation_generator,
-         callbacks=[lrr], verbose=1)
-
+                 epochs=40,
+                 validation_data=validation_generator,
+                 callbacks=[lrr], verbose=1)
 
 # f, ax = plt.subplots(2, 1)  # Creates 2 subplots under 1 column
 #
