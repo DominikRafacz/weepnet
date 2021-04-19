@@ -144,12 +144,13 @@ pred_df.to_csv("kaggle_pred1.csv", index_label="id")
 
 model_add = load_model("models/add_model2")
 pred_add = model_add.predict(test_generator, verbose=1)
+
 classes_add = np.argmax(pred_add, axis=1)
 classes_add_names = [{0:"cat", 1:"dog",2: "frog"}[c] for c in classes_add]
 pred_df_add = pd.DataFrame(classes_add_names, columns=["label"])
 pred_df_add.index = ids
 
-pred_df_new = pred_df
+pred_df_new = pred_df.copy()
 pred_df_new[pred_df_new.label.isin(["dog","cat","frog"])] = pred_df_add[pred_df_new.label.isin(["dog","cat","frog"])]
 pred_df_new.to_csv("kaggle_pred2.csv", index_label="id")
 
