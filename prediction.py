@@ -116,17 +116,42 @@ def create_model(seed, epochs, batch_size):
 
 
 t1 = time.time()
-model, hist, loss, acc = create_model(402, 200, 64)
+model, hist, loss, acc = create_model(84, 200, 64)
 t2 = time.time()
 print("Time: {0:.3f}".format(t2-t1))
 
 model.save("models/final_model")
 
 test_generator = test_datagen.flow_from_directory(
-        'data/test',
+        'data/',
         target_size=img_size,
-        batch_size=64,
+        classes=['test'],
+        batch_size=1,
         class_mode=None,
-        seed=402)
+        shuffle=False)
 
-pred = model.predict(test_generator)
+pred = model.predict(test_generator, verbose=1)
+
+classes = np.argmax(pred, axis=1)
+classes_dict = dict(list(zip(range(10), os.listdir("data/train"))))
+classes_names = [classes_dict[c] for c in classes]
+pred_df = pd.DataFrame(classes_names, columns=["label"])
+
+filenames = list(test_generator.filenames)
+ids = [f.split(".")[0][5:] for f in filenames]
+pred_df.index = ids
+pred_df.to_csv("kaggle_pred1.csv", index_label="id")
+
+#######
+validation_generator_pred = test_datagen.flow_from_directory(
+        'data/validation',
+        target_size=img_size,
+        batch_size=1,
+        class_mode="categorical",
+        shuffle=False)
+
+pred_valid = model.predict(validation_generator_pred, verbose=1)
+
+pred_valid_classes = np.argmax(pred_valid, axis=1)
+
+plot_confusion_matrix(validation_generator_pred.classes, pred_valid_classes, os.listdir("data/train"), normalize=True, filename="conf_matrix_valid")
