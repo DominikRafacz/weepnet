@@ -182,11 +182,18 @@ model4.compile(loss='categorical_crossentropy',
                metrics=['accuracy'])
 history4 = model4.fit(train_generator2, epochs=125, validation_data=validation_generator2, callbacks=[lrr2])
 model4.evaluate(validation_generator2)
-# loss - 0.493, accuracy - 0.8552
+# loss - 0.457, accuracy - 0.865
 pd.DataFrame(history4.history).plot()
 pd.DataFrame(history4.history["lr"]).plot()
-history4_1 = model4.fit(train_generator2, epochs=50, verbose=1, validation_data=validation_generator2, callbacks=[lrr2])
-# loss - 0.456, accuracy - 0.87
-model4.evaluate(validation_generator2)
-pd.DataFrame(history4_1.history).plot()
+visualize([history3, history4], labels=["Adam", "RMSProp"], type="accuracy", filename="adam_vs_rmsp")
+visualize([history3, history4], labels=["Adam", "RMSProp"], type="val_accuracy", filename="adam_vs_rmsp")
+visualize([history3, history4], labels=["Adam", "RMSProp"], type="loss", filename="adam_vs_rmsp")
 model4.save('models/wb_cnn_kaggle2_rmsp_with_lrr')
+import pickle
+with open('hist3.pickle', 'wb') as file_pi:
+    pickle.dump(history3.history, file_pi)
+with open('hist4.pickle', 'wb') as file_pi:
+    pickle.dump(history4.history, file_pi)
+####
+
+sgd_opt = SGD(learning_rate=0.0005, momentum=0.9)
