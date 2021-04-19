@@ -54,12 +54,14 @@ def create_model(seed, epochs, batch_size):
         'data/train',
         target_size=img_size,
         batch_size=batch_size,
+        classes=['cat', 'dog', 'frog'],
         class_mode='categorical',
         seed=seed)
     validation_generator2 = test_datagen.flow_from_directory(
         'data/validation',
         target_size=img_size,
         batch_size=batch_size,
+        classes=['cat', 'dog', 'frog'],
         class_mode='categorical',
         seed=seed)
 
@@ -83,7 +85,6 @@ def create_model(seed, epochs, batch_size):
         BatchNormalization(),
         MaxPool2D(pool_size=(2, 2)),
         Dropout(0.3),
-
         Conv2D(4 * baseMapNum, (3, 3), padding='same', kernel_regularizer=regularizers.l2(weight_decay)),
         Activation('relu'),
         BatchNormalization(),
@@ -96,7 +97,7 @@ def create_model(seed, epochs, batch_size):
         Dense(128, activation='relu'),
         BatchNormalization(),
         Dropout(0.4),
-        Dense(num_classes, activation='softmax')
+        Dense(3, activation='softmax')
     ])
 
     lrr = ReduceLROnPlateau(
@@ -115,54 +116,10 @@ def create_model(seed, epochs, batch_size):
     return model, history, loss, acc
 
 
-t1 = time.time()
-model, hist, loss, acc = create_model(84, 200, 64)
-t2 = time.time()
-print("Time: {0:.3f}".format(t2-t1))
+t3 = time.time()
+model_add, hist_add, loss_add, acc_add = create_model(84, 200, 64)
+t4 = time.time()
+print("Time: {0:.3f}".format(t4-t3))
 
-model.save("models/final_model")
+model_add.save("models/add_model2")
 
-test_generator = test_datagen.flow_from_directory(
-        'data/',
-        target_size=img_size,
-        classes=['test'],
-        batch_size=1,
-        class_mode=None,
-        shuffle=False)
-
-pred = model.predict(test_generator, verbose=1)
-
-classes = np.argmax(pred, axis=1)
-classes_dict = dict(list(zip(range(10), os.listdir("data/train"))))
-classes_names = [classes_dict[c] for c in classes]
-pred_df = pd.DataFrame(classes_names, columns=["label"])
-
-filenames = list(test_generator.filenames)
-ids = [f.split(".")[0][5:] for f in filenames]
-pred_df.index = ids
-pred_df.to_csv("kaggle_pred1.csv", index_label="id")
-
-model_add = load_model("models/add_model2")
-pred_add = model_add.predict(test_generator, verbose=1)
-classes_add = np.argmax(pred_add, axis=1)
-classes_add_names = [{0:"cat", 1:"dog",2: "frog"}[c] for c in classes_add]
-pred_df_add = pd.DataFrame(classes_add_names, columns=["label"])
-pred_df_add.index = ids
-
-pred_df_new = pred_df
-pred_df_new[pred_df_new.label.isin(["dog","cat","frog"])] = pred_df_add[pred_df_new.label.isin(["dog","cat","frog"])]
-pred_df_new.to_csv("kaggle_pred2.csv", index_label="id")
-
-#######
-validation_generator_pred = test_datagen.flow_from_directory(
-        'data/validation',
-        target_size=img_size,
-        batch_size=1,
-        class_mode="categorical",
-        shuffle=False)
-
-pred_valid = model.predict(validation_generator_pred, verbose=1)
-
-pred_valid_classes = np.argmax(pred_valid, axis=1)
-
-plot_confusion_matrix(validation_generator_pred.classes, pred_valid_classes, os.listdir("data/train"), normalize=True, filename="conf_matrix_valid")
